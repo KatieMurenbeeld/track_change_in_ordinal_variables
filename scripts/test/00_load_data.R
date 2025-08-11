@@ -53,9 +53,22 @@ df_month <- df_time %>%
   group_by(`Publication Title`, month_yr, reg_05_pred_class) %>%
   summarise(mag = n())
 
+df_year <- df_time %>%
+  group_by(`Publication Title`, year, reg_05_pred_class) %>%
+  summarise(mag = n())
+
 ## 2.3 Add the degree direction 
 
 df_month <- df_month %>%
+  mutate(deg = case_when(reg_05_pred_class == 1 ~ 270,
+                         reg_05_pred_class == 2 ~ 300, 
+                         reg_05_pred_class == 3 ~ 330, 
+                         reg_05_pred_class == 4 ~ 360, 
+                         reg_05_pred_class == 5 ~ 30, 
+                         reg_05_pred_class == 6 ~ 60, 
+                         reg_05_pred_class == 7 ~ 90))
+
+df_year <- df_year %>%
   mutate(deg = case_when(reg_05_pred_class == 1 ~ 270,
                          reg_05_pred_class == 2 ~ 300, 
                          reg_05_pred_class == 3 ~ 330, 
@@ -70,5 +83,8 @@ df_month <- df_month %>%
   mutate(y = mag * sin(deg*(pi/180)), 
          x = mag * cos(deg*(pi/180)))
 
+df_year <- df_year %>%
+  mutate(y = mag * sin(deg*(pi/180)), 
+         x = mag * cos(deg*(pi/180)))
 
 
