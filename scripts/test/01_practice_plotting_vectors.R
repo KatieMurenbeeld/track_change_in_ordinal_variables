@@ -92,29 +92,29 @@ test <- df_vec_sum %>%
          head_y = month_vec_y)
 
 test$tail_x[2] <- test$head_x[1] 
-#test$tail_y[2] <- test$head_y[1]
+test$tail_y[2] <- test$head_y[1] #comment out to have all vector tails start at zero
 
 test$head_x[2] <- test$tail_x[2] + test$month_vec_x[2]
-#test$head_y[2] <- test$tail_y[2] + test$month_vec_y[2]
+test$head_y[2] <- test$tail_y[2] + test$month_vec_y[2] #comment out to have all vector tails start at zero
 
-#test$tail_x[3:nrow(test)] <- test$month_vec_x[3:nrow(test)] + test$tail_x[2:nrow(test)] 
+test$tail_x[3:nrow(test)] <- test$month_vec_x[3:nrow(test)] + test$tail_x[2:nrow(test)] #comment out to have all vector tails start at zero
 
 test_subset <- test[2:nrow(test),]
 
-#test_subset$tail_x[2:nrow(test_subset)] <- test_subset$month_vec_x[2:nrow(test_subset)] + test_subset$tail_x[1:nrow(test_subset)-1]
+test_subset$tail_x[2:nrow(test_subset)] <- test_subset$month_vec_x[2:nrow(test_subset)] + test_subset$tail_x[1:nrow(test_subset)-1] #comment out to have all vector tails start at zero
 
 for (i in 2:nrow(test_subset)){
   test_subset$tail_x[i] <- test_subset$head_x[i-1]
-  #test_subset$tail_y[i] <- test_subset$head_y[i-1]
+  test_subset$tail_y[i] <- test_subset$head_y[i-1] #comment out to have all vector tails start at zero
   test_subset$head_x[i] <- test_subset$tail_x[i] + test_subset$month_vec_x[i]
   test_subset$head_y[i] <- test_subset$tail_y[i] + test_subset$month_vec_y[i]
 }
 
 df_new <- rbind(test[1,], test_subset)
 
-#df_new <- df_new %>%
-#  mutate(end_x = month_vec_x + tail_x,
-#         end_y = month_vec_y + tail_y)
+df_new <- df_new %>%
+  mutate(end_x = month_vec_x + tail_x,
+         end_y = month_vec_y + tail_y)
 
 
 ggplot() +
@@ -171,7 +171,7 @@ ggplot() +
   theme_minimal()
 
 ggplot(df_new, aes(head_x, head_y)) + 
-  geom_point()
+  geom_line()
 
 ggplot(df_vec_sum[1:4,], aes(month_vec_x, month_vec_y, color = month_yr)) +
   geom_point()
