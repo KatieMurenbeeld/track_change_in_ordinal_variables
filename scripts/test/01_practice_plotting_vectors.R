@@ -10,7 +10,7 @@ library(ggplot2) # For plotting and visualization
 # -------------------------------------------------------------
 # 1. Load the wildlife value orientation vector coordinates from 00_load_data.R
 
-df_plot <- df_month
+df_plot <- df_year
 
 # STEP 2: Plot two vectors with (0,0) as their origins
 # -------------------------------------------------------------
@@ -18,36 +18,37 @@ df_plot <- df_month
 
 ggplot() +
   geom_point() +
-  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[1], yend = df_plot$y[1]),
-               arrow = arrow()
-  ) +
   geom_segment(aes(x = 0, y = 0, xend = df_plot$x[2], yend = df_plot$y[2]),
                arrow = arrow()
   ) +
-  xlim(-1,1) + 
-  ylim(-1,1) + 
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[3], yend = df_plot$y[3]),
+               arrow = arrow()
+  ) +
+  #xlim(-1,1) + 
+  #ylim(-1,1) + 
   theme_minimal()
 
 # STEP 3: Add the two vectors from Step 2 and plot 
 # -------------------------------------------------------------
 # 3.1 Vector addition
 
-y_new <- df_plot$y[1] + df_plot$y[2]
-x_new <- df_plot$x[1] + df_plot$x[2]
+y_new <- df_plot$y[2] + df_plot$y[3]
+x_new <- df_plot$x[2] + df_plot$x[3]
 
 ggplot() +
   geom_point() +
-  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[1], yend = df_plot$y[1]),
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[2], yend = df_plot$y[2]),
                arrow = arrow()
   ) +
-  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[2], yend = df_plot$y[2]),
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[3], yend = df_plot$y[3]),
                arrow = arrow()
   ) +
   geom_segment(aes(x = 0, y = 0, xend = x_new, yend = y_new),
                arrow = arrow(), color = "red"
   ) +
-  xlim(-1,1) + 
-  ylim(-1,1) + 
+  coord_fixed() +
+  xlim(0,10) + 
+  ylim(-10,10) + 
   theme_minimal()
 
 # STEP 4: The new vector from Step 3 is now the origin for the next month 
@@ -73,14 +74,14 @@ ggplot() +
   geom_segment(aes(x = x_new, y = y_new, xend = df_plot$x[3] + x_new, yend = df_plot$y[3] + y_new),
                arrow = arrow(), color = "orange"
   ) +
-  xlim(-3, 3) + 
-  ylim(-3, 3) + 
+  #xlim(-3, 3) + 
+  #ylim(-3, 3) + 
   theme_minimal()
 
 # 4.2 Get the vector sum for each month-year and each news paper
 
 df_vec_sum <- df_plot %>%
-  group_by(`Publication Title`, month_yr) %>%
+  group_by(`Publication Title`, year) %>% # change to month_yr or year 
   summarise(month_vec_x = sum(x), 
             month_vec_y = sum(y))
 
@@ -170,11 +171,37 @@ ggplot() +
   ylim(-8, 8) + 
   theme_minimal()
 
-ggplot(df_new, aes(head_x, head_y)) + 
-  geom_line()
+ggplot(df_new, aes(head_x, head_y, color = as.factor(year))) + 
+  geom_line(color = "black") +
+  geom_point() +
+  xlim(0, 550) + 
+  ylim(-550, 550) + 
+  theme_minimal() + 
+  coord_fixed() +
+  labs(title="Great Falls Tribune: tail xy = head xy (t-1)")
 
 ggplot(df_vec_sum[1:4,], aes(month_vec_x, month_vec_y, color = month_yr)) +
   geom_point()
+
+
+p <- ggplot(df_new) +
+#  geom_point(aes(df_new$end_x[1], df_new$end_y[1])) +
+  geom_segment(x = 0, y = 0, xend = df_new$end_x[1], yend = df_new$end_y[1],
+               arrow = arrow(length=unit(0.15,"cm"))
+  )
+print(p)
+for (i in 1:nrow(df_new)){
+  p <- p + 
+    geom_segment(x = df_new$head_x[i], y = df_new$head_y[i], xend = df_new$end_x[i+1], yend = df_new$end_y[i+1],
+                 arrow = arrow(length=unit(0.15,"cm"))
+                 #arrow.fill = df_new$month_yr[i]
+                 #color = df_new$month_yr
+                 ) +
+    xlim(0, 150) + 
+    ylim(-150, 150) + 
+    theme_minimal()
+}
+print(p)
 
 
 
