@@ -6,10 +6,8 @@
 # -------------------------------------------------------------
 
 vector_tails_to_head <- function(data, time_step, publication){
-  df_plot <- data
-  
-  df_vec_sum <- df_plot %>%
-    group_by(`Publication Title`, time_step) %>%
+  df_vec_sum <- data %>%
+    group_by(`Publication Title`, {{time_step}}) %>%
     summarise(month_vec_x = sum(x), 
               month_vec_y = sum(y))
   
@@ -20,31 +18,39 @@ vector_tails_to_head <- function(data, time_step, publication){
            head_x = month_vec_x,
            head_y = month_vec_y)
 
-  df_tmp$tail_x[2] <- df_tmp$head_x[1] 
-  df_tmp$tail_y[2] <- df_tmp$head_y[1] #comment out to have all vector tails start at zero
+   df_tmp$tail_x[2] <- df_tmp$head_x[1] 
+   df_tmp$tail_y[2] <- df_tmp$head_y[1]
+   #return(df_tmp)
+   
+   df_tmp$head_x[2] <- df_tmp$tail_x[2] + df_tmp$month_vec_x[2]
+   df_tmp$head_y[2] <- df_tmp$tail_y[2] + df_tmp$month_vec_y[2] 
+   #return(df_tmp)
+ 
+   df_tmp$tail_x[3:nrow(df_tmp)] <- df_tmp$month_vec_x[3:nrow(df_tmp)] + df_tmp$tail_x[2:nrow(df_tmp)]
+   return(df_tmp)
 
-  df_tmp$head_x[2] <- df_tmp$tail_x[2] + df_tmp$month_vec_x[2]
-  df_tmp$head_y[2] <- df_tmp$tail_y[2] + df_tmp$month_vec_y[2] #comment out to have all vector tails start at zero
+   df_subset <- df_tmp[2:nrow(df_tmp),]
+   return(df_subset)
 
-  df_tmp$tail_x[3:nrow(df_tmp)] <- df_tmp$month_vec_x[3:nrow(df_tmp)] + df_tmp$tail_x[2:nrow(df_tmp)] #comment out to have all vector tails start at zero
 
-  df_subset <- df_tmp[2:nrow(df_tmp),]
+   df_subset$tail_x[2:nrow(df_subset)] <- df_subset$month_vec_x[2:nrow(df_subset)] + df_subset$tail_x[1:nrow(df_subset)-1]
+   return(df_subset)
 
-  df_subset$tail_x[2:nrow(df_subset)] <- df_subset$month_vec_x[2:nrow(df_subset)] + df_subset$tail_x[1:nrow(df_subset)-1] #comment out to have all vector tails start at zero
-
-  for (i in 2:nrow(df_subset)){
-    df_subset$tail_x[i] <- df_subset$head_x[i-1]
-    df_subset$tail_y[i] <- df_subset$head_y[i-1] #comment out to have all vector tails start at zero
-    df_subset$head_x[i] <- df_subset$tail_x[i] + df_subset$month_vec_x[i]
-    df_subset$head_y[i] <- df_subset$tail_y[i] + df_subset$month_vec_y[i]
-    }
-
-  df_new <- rbind(test[1,], df_subset)
-
-  df_new <- df_new %>%
-    mutate(end_x = month_vec_x + tail_x,
-           end_y = month_vec_y + tail_y)
-
+   for (i in 2:nrow(df_subset)){
+     df_subset$tail_x[i] <- df_subset$head_x[i-1]
+     df_subset$tail_y[i] <- df_subset$head_y[i-1]
+     df_subset$head_x[i] <- df_subset$tail_x[i] + df_subset$month_vec_x[i]
+     df_subset$head_y[i] <- df_subset$tail_y[i] + df_subset$month_vec_y[i]
+     }
+   return(df_subset)
+   
+   df_new <- rbind(df_tmp[1,], df_subset)
+   return(df_new)
+   
+   df_new <- df_new %>%
+     mutate(end_x = month_vec_x + tail_x,
+            end_y = month_vec_y + tail_y)
+   return(df_new)
 }
 
 
@@ -56,7 +62,7 @@ vector_tails_to_zero <- function(data, time_step, publication){
   df_plot <- data
   
   df_vec_sum <- df_plot %>%
-    group_by(`Publication Title`, time_step) %>%
+    group_by(`Publication Title`, {{time_step}}) %>%
     summarise(month_vec_x = sum(x), 
               month_vec_y = sum(y))
   
@@ -68,9 +74,10 @@ vector_tails_to_zero <- function(data, time_step, publication){
            head_y = month_vec_y)
   
   df_tmp$tail_x[2] <- df_tmp$head_x[1] 
-  
+  return(df_tmp)
   df_tmp$head_x[2] <- df_tmp$tail_x[2] + df_tmp$month_vec_x[2]
-
+  return(df_tmp)
+  
   df_subset <- df_tmp[2:nrow(df_tmp),]
   
   for (i in 2:nrow(df_subset)){
@@ -78,11 +85,13 @@ vector_tails_to_zero <- function(data, time_step, publication){
     df_subset$head_x[i] <- df_subset$tail_x[i] + df_subset$month_vec_x[i]
     df_subset$head_y[i] <- df_subset$tail_y[i] + df_subset$month_vec_y[i]
   }
+  return(df_subset) 
   
   df_new <- rbind(test[1,], df_subset)
   
   df_new <- df_new %>%
     mutate(end_x = month_vec_x + tail_x,
            end_y = month_vec_y + tail_y)
+  
   
 }
