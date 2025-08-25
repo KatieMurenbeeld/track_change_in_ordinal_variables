@@ -87,4 +87,12 @@ df_year <- df_year %>%
   mutate(y = mag * sin(deg*(pi/180)), 
          x = mag * cos(deg*(pi/180)))
 
+# 3.0 Save to a csv
+
+write_csv(df_month, here::here(paste0("data/processed/test_wvo_vectors_months_",
+                                      Sys.Date(), ".csv")))
+
+write_csv(df_year, here::here(paste0("data/processed/test_wvo_vectors_years_",
+                                      Sys.Date(), ".csv")))
+
 
