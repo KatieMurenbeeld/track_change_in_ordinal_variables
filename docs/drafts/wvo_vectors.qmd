@@ -1,0 +1,217 @@
+---
+title: "Wildlife Value Orientations: Using Vectors to Aggregate"
+author: "Katie Murenbeeld"
+format: 
+  revealjs:
+    smaller: true
+    scrollable: true
+---
+
+# The Challenge
+
+## How to weight ordinal data to track through time?
+
+## Wildlife value orientations as vectors?
+:::: {.columns}
+
+::: {.column width="60%"}
+
+- For each time step, the WVOs will have a magnitude (the total number of articles with that score) and a direction (the angle in degrees)
+- To get a aggregate WVO for the newspaper at that time step we can use vector addition
+- And then track those "aggregate" vectors through time
+:::
+
+::: {.column width="40%"}
+
+```{r vector_image}
+#| fig-width: 4
+#| fig-height: 6
+# Load Required Packages
+library(tidyverse) # For loading and manipulating data tables
+library(ggplot2) # For plotting and visualization
+
+# Create sample table for the WVO vectors
+## label (mutualism or domination), magnitude (1 for all), deg, x and y positions
+sample_df <- data.frame(
+  wvo = c("1 Domination", "2", "3", "4 Neutral", "5", "6", "7 Mutualism"),
+  mag = c((rep(1, 7))),
+  deg = c(270, 300, 330, 360, 30, 60, 90)
+)
+sample_df <- sample_df %>%
+  mutate(y = mag * sin(deg*(pi/180)), 
+         x = mag * cos(deg*(pi/180)))
+
+# Create a color palette
+#col_pal <- c("seagreen", "darkcyan", "cyan4", "cyan3", "cadetblue", "lightskyblue", "skyblue4")
+col_pal <- hcl.colors(7, "Tofino")
+
+# Use a for loop to plot the segments
+p <- ggplot(sample_df) +
+  geom_segment(x = 0, y = 0, xend = sample_df$x[1], yend = sample_df$y[1],
+               arrow = arrow(length=unit(0.15,"cm")), color = col_pal[1]
+  )
+#print(p)
+for (i in 1:nrow(sample_df)){
+  p <- p + 
+    geom_segment(x = 0, y = 0, xend = sample_df$x[i+1], yend = sample_df$y[i+1],
+                 arrow = arrow(length=unit(0.15,"cm")), color = col_pal[i]
+                 ) +
+    coord_fixed() +
+    xlim(0, 1) + 
+    ylim(-1, 1) + 
+    theme_minimal()
+}
+print(p)
+
+```
+:::
+
+::::
+
+# The Process
+
+## Vectors with magnitude and degree
+
+For each newspaper per year
+
+-  Data frame with magnitude, direction, positions of "head" of vector
+
+
+```{r data table}
+library(DT)
+# code
+df_plot <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_years_2025-08-25.csv")
+
+names(df_plot) <- c("Publication", "Year", "Predicted_WVO", "Magnitude", "Direction", "y", "x")
+
+is_num <- sapply(df_plot, is.numeric)
+df_plot[is_num] <- lapply(df_plot[is_num], round, 2)
+
+DT::datatable(df_plot, editable = list(
+  target = 'row', disable = list(columns = c(1, 3, 4))
+))
+
+```
+
+
+## Vector Addition - Part 1
+
+```{r vector_addition01}
+
+#| fig-width: 4
+#| fig-height: 6
+
+y_new <- df_plot$y[1] + df_plot$y[2] + df_plot$y[3] + df_plot$y[4] + df_plot$y[5]
+x_new <- df_plot$x[1] + df_plot$x[2] + df_plot$x[3] + df_plot$x[4] + df_plot$x[5]
+
+ggplot() +
+  geom_point() +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[1], yend = df_plot$y[1]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[2], yend = df_plot$y[2]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[3], yend = df_plot$y[3]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[4], yend = df_plot$y[4]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[5], yend = df_plot$y[5]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = x_new, yend = y_new),
+               arrow = arrow(length=unit(0.15,"cm")), color = "darkcyan"
+  ) +
+  coord_fixed() +
+  xlim(0,15) + 
+  ylim(-15,15) + 
+  theme_minimal()
+```
+## Vector Addition - Part 2
+
+```{r vector_addition02rc}
+
+library(patchwork)
+
+y_new <- df_plot$y[1] + df_plot$y[2] + df_plot$y[3] + df_plot$y[4] + df_plot$y[5]
+x_new <- df_plot$x[1] + df_plot$x[2] + df_plot$x[3] + df_plot$x[4] + df_plot$x[5]
+
+plt <- ggplot() +
+  geom_point() +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[1], yend = df_plot$y[1]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[2], yend = df_plot$y[2]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[3], yend = df_plot$y[3]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[4], yend = df_plot$y[4]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[5], yend = df_plot$y[5]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = x_new, yend = y_new),
+               arrow = arrow(length=unit(0.15,"cm")), color = "darkcyan"
+  ) +
+  coord_fixed() +
+  xlim(0,15) + 
+  ylim(-15,15) + 
+  theme_minimal()
+
+y_new_2 <- df_plot$y[6] + df_plot$y[7] + df_plot$y[8] + df_plot$y[9] + df_plot$y[10]
+x_new_2 <- df_plot$x[6] + df_plot$x[7] + df_plot$x[8] + df_plot$x[9] + df_plot$x[10]
+
+plt2 <- ggplot() +
+  geom_point() +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[6], yend = df_plot$y[6]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[7], yend = df_plot$y[7]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[8], yend = df_plot$y[8]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[9], yend = df_plot$y[9]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = df_plot$x[10], yend = df_plot$y[10]),
+               arrow = arrow(length=unit(0.15,"cm"))
+  ) +
+  geom_segment(aes(x = 0, y = 0, xend = x_new_2, yend = y_new_2),
+               arrow = arrow(length=unit(0.15,"cm")), color = "purple4"
+  ) +
+  coord_fixed() +
+  xlim(0,15) + 
+  ylim(-15,15) + 
+  theme_minimal()
+
+plt3 <- ggplot() +
+  geom_point() +
+  geom_segment(aes(x = 0, y = 0, xend = x_new, yend = y_new),
+               arrow = arrow(length=unit(0.15,"cm")), color = "darkcyan"
+  ) +
+  geom_segment(aes(x = x_new, y = y_new, xend = x_new + x_new_2, yend = y_new + y_new_2),
+               arrow = arrow(length=unit(0.15,"cm")), color = "purple4"
+               ) +
+  coord_fixed() +
+  xlim(0,30) + 
+  ylim(-30,30) + 
+  theme_minimal()
+
+plt | plt2 | plt3
+```
+
+
+# Examples
+
+## Great Falls Tribune
+
+
+
+## New York Times
