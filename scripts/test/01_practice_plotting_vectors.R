@@ -10,8 +10,8 @@ library(ggplot2) # For plotting and visualization
 # -------------------------------------------------------------
 # 1. Load the wildlife value orientation vector coordinates from 00_load_data.R
 
-df_plot <- df_year
-
+#df_plot <- df_year
+df_plot <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_years_2025-08-25.csv")
 # STEP 2: Plot two vectors with (0,0) as their origins
 # -------------------------------------------------------------
 # 2. Practice plotting two vectors
@@ -86,19 +86,19 @@ df_vec_sum <- df_plot %>%
             month_vec_y = sum(y))
 
 test <- df_vec_sum %>%
-  filter(`Publication Title` == "Great Falls Tribune") %>%
+  filter(`Publication Title` == "New York Times") %>%
   mutate(tail_x = 0, 
          tail_y = 0,
          head_x = month_vec_x,
          head_y = month_vec_y)
 
 test$tail_x[2] <- test$head_x[1] 
-test$tail_y[2] <- test$head_y[1] #comment out to have all vector tails start at zero
+#test$tail_y[2] <- test$head_y[1] #comment out to have all vector tails start at zero
 
 test$head_x[2] <- test$tail_x[2] + test$month_vec_x[2]
-test$head_y[2] <- test$tail_y[2] + test$month_vec_y[2] #comment out to have all vector tails start at zero
+#test$head_y[2] <- test$tail_y[2] + test$month_vec_y[2] #comment out to have all vector tails start at zero
 
-test$tail_x[3:nrow(test)] <- test$month_vec_x[3:nrow(test)] + test$tail_x[2:nrow(test)] #comment out to have all vector tails start at zero
+#test$tail_x[3:nrow(test)] <- test$month_vec_x[3:nrow(test)] + test$tail_x[2:nrow(test)] #comment out to have all vector tails start at zero
 
 test_subset <- test[2:nrow(test),]
 
@@ -106,17 +106,19 @@ test_subset$tail_x[2:nrow(test_subset)] <- test_subset$month_vec_x[2:nrow(test_s
 
 for (i in 2:nrow(test_subset)){
   test_subset$tail_x[i] <- test_subset$head_x[i-1]
-  test_subset$tail_y[i] <- test_subset$head_y[i-1] #comment out to have all vector tails start at zero
+#  test_subset$tail_y[i] <- test_subset$head_y[i-1] #comment out to have all vector tails start at zero
   test_subset$head_x[i] <- test_subset$tail_x[i] + test_subset$month_vec_x[i]
   test_subset$head_y[i] <- test_subset$tail_y[i] + test_subset$month_vec_y[i]
 }
 
 df_new <- rbind(test[1,], test_subset)
 
-df_new <- df_new %>%
+df_new_nyt <- df_new %>%
   mutate(end_x = month_vec_x + tail_x,
          end_y = month_vec_y + tail_y)
 
+write_csv(df_new_nyt, here::here(paste0("data/processed/test_wvo_vectors_nyt_years_",
+                                     Sys.Date(), ".csv")))
 
 ggplot() +
   geom_point() +
