@@ -29,6 +29,9 @@ format:
 # Load Required Packages
 library(tidyverse) # For loading and manipulating data tables
 library(ggplot2) # For plotting and visualization
+library(ggrepel) # For ease of plotting labels
+library(DT) # For creating nice looking tables
+library(patchwork) # For placing plots
 
 # Create sample table for the WVO vectors
 ## label (mutualism or domination), magnitude (1 for all), deg, x and y positions
@@ -48,20 +51,35 @@ col_pal <- hcl.colors(7, "Tofino")
 # Use a for loop to plot the segments
 p <- ggplot(sample_df) +
   geom_segment(x = 0, y = 0, xend = sample_df$x[1], yend = sample_df$y[1],
-               arrow = arrow(length=unit(0.15,"cm")), color = col_pal[1]
+               arrow = arrow(length=unit(0.15,"cm")), color = col_pal[1],
+               linewidth = 2
   )
-#print(p)
 for (i in 1:nrow(sample_df)){
   p <- p + 
     geom_segment(x = 0, y = 0, xend = sample_df$x[i+1], yend = sample_df$y[i+1],
-                 arrow = arrow(length=unit(0.15,"cm")), color = col_pal[i]
+                 arrow = arrow(length=unit(0.25,"cm")), color = col_pal[i],
+                 linewidth = 2
                  ) +
+    annotate("text", x = 0, y = -1.1, label = "1: Domination") + 
+    annotate("text", x = 0.56, y = -0.91, label = "2") +
+    annotate("text", x = 0.91, y = -0.56, label = "3") +
+    annotate("text", x = 1.1, y = 0.1, label = "4: Neutral") +
+    annotate("text", x = 0.91, y = 0.56, label = "5") +
+    annotate("text", x = 0.56, y = 0.91, label = "6") +
+    annotate("text", x = 0, y = 1.1, label = "7: Mutualism") +
+    geom_hline(yintercept = 0, color = "grey", linewidth = 0.5, linetype = "dashed") +
+    geom_vline(xintercept = 0, color = "grey", linewidth = 0.5, linetype = "dashed") +
     coord_fixed() +
-    xlim(0, 1) + 
-    ylim(-1, 1) + 
-    theme_minimal()
+    xlim(-0.35, 1.35) + 
+    ylim(-1.35, 1.35) +
+    theme_minimal() +
+    theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank())
 }
-print(p)
 
 ```
 :::
@@ -74,24 +92,44 @@ print(p)
 
 For each newspaper per year
 
--  Data frame with magnitude, direction, positions of "head" of vector
-
+- Data frame with magnitude, direction, positions of "head" of vector
 
 ```{r data table}
-library(DT)
-# code
+
+# Load in the wvo by paper and year data
 df_plot <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_years_2025-08-25.csv")
 
+# rename the columns
 names(df_plot) <- c("Publication", "Year", "Predicted_WVO", "Magnitude", "Direction", "y", "x")
 
+# set the numeric columns to round to two decimal places
 is_num <- sapply(df_plot, is.numeric)
 df_plot[is_num] <- lapply(df_plot[is_num], round, 2)
 
-DT::datatable(df_plot, editable = list(
+# use the DT package to output a scrollable/interactive table
+DT::datatable(df_plot, options = list(pageLength = 3), editable = list(
   target = 'row', disable = list(columns = c(1, 3, 4))
 ))
 
 ```
+- But how to get the x and y positions?
+
+## Vectors with magnitude and degree
+
+Trigonometry
+
+::: {.absolute top=120 left=0 width="600" height="800"}
+```{r vector_get_x_y, fig.width = 4, fig.height = 6}
+
+p_curve <- p +
+  geom_curve(x = 0, y = 1.0, xend = 1, yend = 0, curvature = -0.5) + 
+  annotate("text", x = 1.05, y = -0.1, label = "0") + 
+  annotate("text", x = 0.05, y = 1.2, label = "90") + 
+  xlim(-0.25, 1.25) + 
+  ylim(-1.25, 1.25)
+p_curve
+```
+:::
 
 
 ## Vector Addition - Part 1
@@ -133,7 +171,6 @@ ggplot() +
 
 ```{r vector_addition02rc}
 
-library(patchwork)
 
 y_new <- df_plot$y[1] + df_plot$y[2] + df_plot$y[3] + df_plot$y[4] + df_plot$y[5]
 x_new <- df_plot$x[1] + df_plot$x[2] + df_plot$x[3] + df_plot$x[4] + df_plot$x[5]
