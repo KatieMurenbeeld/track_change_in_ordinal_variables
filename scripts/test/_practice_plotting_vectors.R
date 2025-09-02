@@ -80,12 +80,12 @@ ggplot() +
 
 # 4.2 Get the vector sum for each month-year and each news paper
 
-df_vec_sum <- df_plot %>%
+test_df_vec_sum <- df_plot %>%
   group_by(`Publication Title`, year) %>% # change to month_yr or year 
   summarise(month_vec_x = sum(x), 
             month_vec_y = sum(y))
 
-test <- df_vec_sum %>%
+test <- test_df_vec_sum %>%
   filter(`Publication Title` == "New York Times") %>%
   mutate(tail_x = 0, 
          tail_y = 0,
