@@ -1,5 +1,5 @@
 # ==============================================================================
-# Test working with moving averages and changing window sizes
+# Test working with moving averages
 # ==============================================================================
 
 # Load Required Packages
@@ -42,16 +42,16 @@ df_vec_sum_m %>%
     y = "Distance from Neutral WVO")
 
 df_vec_sum_m %>% 
-  filter(`Publication Title` == "Great Falls Tribune") %>%
+  filter(`Publication Title` == "The Billings Gazette") %>%
   ggplot(., aes(month_yr, head_y)) + 
   geom_point(aes(size = total_articles), alpha = 0.6) + 
-  geom_line(color = "purple4", alpha = 0.4) + 
-  geom_ma(ma_fun = SMA, n = 3, color = "black") +
-  geom_ma(ma_fun = SMA, n = 6, color = "red") +
-  geom_ma(ma_fun = SMA, n = 12, color = "green") +
+  geom_smooth(color = "purple4", alpha = 0.4) + 
+  #geom_ma(ma_fun = SMA, n = 3, color = "black") +
+  #geom_ma(ma_fun = SMA, n = 6, color = "red") +
+  #geom_ma(ma_fun = SMA, n = 12, color = "green") +
   theme_bw() +
   ylim(-7,7) +
-  labs(title = "Great Falls Tribune: SMA, n = 12",
+  labs(title = "The Billings Gazette",
        x = "Years", 
        y = "Distance from Neutral WVO")
 
