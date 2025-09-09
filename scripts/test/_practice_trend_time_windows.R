@@ -115,9 +115,11 @@ final_p10 <- p10 +
   ylim(1,7) +
   xlim(1998,2028) +
   labs(x = "<b>Year</b>", 
-       y = "<b>Weighted Mean WVO</b>", 
-       caption = "Any combination of<span style = 'color:#26456EFF'>
-       <b>highlighed</b></span> segments <br> would show...</span>") + 
+       y = "<b>Weighted Mean WVO</b><br>
+        <span style = 'font-size:10pt'>from the Great Falls Tribune</span>", 
+       caption = "Many combinations of<span style = 'color:#26456EFF'>
+       <b>highlighed</b></span><br> segments would show contradictory WVO
+       shifts.</span>") + 
   theme_classic() +
   theme(title = element_markdown(vjust = -5),
         axis.line=element_blank(),
@@ -127,7 +129,7 @@ final_p10 <- p10 +
         axis.text.x = element_markdown(size = 11),
         axis.title.x = element_markdown(), 
         legend.position = "none", 
-        plot.caption = element_markdown(lineheight = 1.2))
+        plot.caption = element_markdown(lineheight = 1.2, hjust = 0))
 
 print(final_p10)
 ggsave(here::here("outputs/test/gft_10yr_wvo_shift_blues.png"), final_p10, 
