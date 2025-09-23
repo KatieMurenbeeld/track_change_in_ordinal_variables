@@ -186,6 +186,8 @@ final_p5 <- p5 +
         legend.position = "none", 
         plot.caption = element_markdown(lineheight = 1.2, hjust = 0))
 final_p5
+ggsave(here::here("outputs/test/gft_5yr_wvo_shift_blues.png"), final_p5, 
+       height = 6, width = 8, dpi = 300)
 
 ## Plot the line between the start and end year 2 year gap
 gft_2yr_df <- gfb_yr %>%
@@ -237,4 +239,6 @@ final_p2 <- p2 +
         legend.position = "none", 
         plot.caption = element_markdown(lineheight = 1.2, hjust = 0))
 final_p2
+ggsave(here::here("outputs/test/gft_2yr_wvo_shift_blues.png"), final_p2, 
+       height = 6, width = 8, dpi = 300)
 
