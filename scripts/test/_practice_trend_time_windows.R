@@ -145,7 +145,47 @@ gft_5yr_df <- gfb_yr %>%
          yend_5 = lead(wm_wvo, n = 5)) %>%
   filter(xend_5 <= max(year))
 
+p5 <- ggplot(gft_5yr_df, aes(x = x_5, y = y_5, xend = xend_5, yend = yend_5)) +
+  geom_segment(size = 1, arrow = arrow(length = unit(0.15, "cm")), color = blues[30]) + # Optional: adjust size and add arrows
+  gghighlight(x_5 %in% c(2004:2009))
+p5
 
+final_p5 <- p5 +
+  geom_point(x = 2004, y = gft_5yr_df$y_5[gft_5yr_df$x_5 == 2004], color = "#585858FF") +
+  geom_point(x = 2014, y = gft_5yr_df$yend_5[gft_5yr_df$xend_5 == 2014], color = "#585858FF") +
+  geom_hline(yintercept = 4, color = "grey", linetype = "dashed") + 
+  annotate("text", x = 2027, y = 4.15, label = "Neutral") + 
+  annotate("text", x = 2027, y = 6.1, label = "Mutualism") + 
+  annotate("text", x = 2027, y = 1.65, label = "Domination") + 
+  annotate("text", x = 2014, y = gft_5yr_df$yend_5[gft_5yr_df$xend_5 == 2014] - 0.25, 
+           label = "2014") +
+  annotate("text", x = 2004, y = gft_5yr_df$yend_5[gft_5yr_df$xend_5 == 2014] - 0.25, 
+           label = "2004") +
+  annotate("richtext", x = 1998, y = 6.75, 
+           label = "<span style = 'font-size:14pt'>Why length of time frame 
+           matters:</span><br>
+       <span style = 'font-size:10pt'>A 10-year time span misses  
+       finer scale shifts in <b>W</b>ildlife <b>V</b>alue 
+       <b>O</b>rientations</span>", 
+           fill = NA, label.color = NA, hjust = 0) +
+  ylim(1,7) +
+  xlim(1998,2028) +
+  labs(x = "<b>Year</b>", 
+       y = "<b>Weighted Mean WVO</b><br>
+        <span style = 'font-size:10pt'>from the Great Falls Tribune</span>", 
+       caption = "Each segment represents<span style = 'color:#26456EFF'>
+       <b>5</b></span> years.</span>") + 
+  theme_classic() +
+  theme(title = element_markdown(vjust = -5),
+        axis.line=element_blank(),
+        axis.ticks = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_markdown(size = 11),
+        axis.title.x = element_markdown(), 
+        legend.position = "none", 
+        plot.caption = element_markdown(lineheight = 1.2, hjust = 0))
+final_p5
 
 ## Plot the line between the start and end year 2 year gap
 gft_2yr_df <- gfb_yr %>%
@@ -156,31 +196,45 @@ gft_2yr_df <- gfb_yr %>%
   filter(xend_2 <= max(year))
 
 
-p2 <- ggplot(gfb_yr) +
-  geom_point(aes(year, wm_wvo)) +
-  geom_segment(x = 1999, y = gfb_yr$wm_wvo[gfb_yr$year == 1999], 
-               xend = 2001, yend = gfb_yr$wm_wvo[gfb_yr$year == 2001],
-               arrow = arrow(length=unit(0.15,"cm"))
-  )
-for (i in 1:nrow(gfb_yr)) {
-  p2 <- p2 + 
-    #geom_point(x = gfb_yr$year[i], y = gfb_yr$wm_wvo[i], color = "red") + 
-    #geom_point(x = gfb_yr$year[i+2], y = gfb_yr$wm_wvo[i+2], color = "blue") + 
-    geom_segment(x = gfb_yr$year[i], y = gfb_yr$wm_wvo[i], 
-                 xend = gfb_yr$year[i+2], yend = gfb_yr$wm_wvo[i+2],
-                 arrow = arrow(length=unit(0.15,"cm")), 
-                 color = test_colors[i]
-    )
-  if (i > nrow(gfb_yr) - 2) {
-    break
-  }
-}
-print(p2)
+p2 <- ggplot(gft_2yr_df, aes(x = x_2, y = y_2, xend = xend_2, yend = yend_2)) +
+  geom_segment(size = 1, arrow = arrow(length = unit(0.15, "cm")), color = blues[30]) + # Optional: adjust size and add arrows
+  gghighlight(x_2 %in% c(2004:2012))
+p2
 
-final_p2 <- p2 + 
-  geom_hline(yintercept = 4) + 
+final_p2 <- p2 +
+  geom_point(x = 2004, y = gft_2yr_df$y_2[gft_2yr_df$x_2 == 2004], color = "#585858FF") +
+  geom_point(x = 2014, y = gft_2yr_df$yend_2[gft_2yr_df$xend_2 == 2014], color = "#585858FF") +
+  geom_hline(yintercept = 4, color = "grey", linetype = "dashed") + 
+  annotate("text", x = 2027, y = 4.15, label = "Neutral") + 
+  annotate("text", x = 2027, y = 6.1, label = "Mutualism") + 
+  annotate("text", x = 2027, y = 1.65, label = "Domination") + 
+  annotate("text", x = 2014, y = gft_2yr_df$yend_2[gft_2yr_df$xend_2 == 2014] - 0.25, 
+           label = "2014") +
+  annotate("text", x = 2004, y = gft_2yr_df$yend_2[gft_2yr_df$xend_2 == 2014] - 0.25, 
+           label = "2004") +
+  annotate("richtext", x = 1998, y = 6.75, 
+           label = "<span style = 'font-size:14pt'>Why length of time frame 
+           matters:</span><br>
+       <span style = 'font-size:10pt'>A 10-year time span misses  
+       finer scale shifts in <b>W</b>ildlife <b>V</b>alue 
+       <b>O</b>rientations</span>", 
+           fill = NA, label.color = NA, hjust = 0) +
   ylim(1,7) +
-  theme_bw()
-
-print(final_p2)
+  xlim(1998,2028) +
+  labs(x = "<b>Year</b>", 
+       y = "<b>Weighted Mean WVO</b><br>
+        <span style = 'font-size:10pt'>from the Great Falls Tribune</span>",
+       caption = "Each segment represents<span style = 'color:#26456EFF'>
+       <b>2</b></span> years.</span>") + 
+  theme_classic() +
+  theme(title = element_markdown(vjust = -5),
+        axis.line=element_blank(),
+        axis.ticks = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_markdown(size = 11),
+        axis.title.x = element_markdown(), 
+        legend.position = "none", 
+        plot.caption = element_markdown(lineheight = 1.2, hjust = 0))
+final_p2
 
