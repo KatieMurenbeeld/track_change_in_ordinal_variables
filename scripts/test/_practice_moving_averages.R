@@ -77,11 +77,11 @@ test.arch <- dynlm(ehatsq ~ L(ehatsq), data = ehatsq)
 
 summary(test.arch)
 
-#library(FinTS)
+library(FinTS)
 test.archTest <- ArchTest(test$wm_wvo, lags = 1, demean = TRUE)
 test.archTest
 
-#library(fGarch)
+library(fGarch)
 arch.fit <- garchFit(~garch(1,0), data = test$wm_wvo, trace = F)
 summary(arch.fit)
 
