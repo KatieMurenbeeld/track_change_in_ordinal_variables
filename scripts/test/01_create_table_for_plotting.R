@@ -10,8 +10,8 @@ library(ggplot2) # For plotting and visualization
 # ------------------------------------------------------------------------------
 # 1.1 Load the wildlife value orientation vector coordinates from 00_load_data.R
 
-df_months <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_months_2025-08-25.csv")
-df_years <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_years_2025-08-25.csv")
+df_months <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_months_2025-09-23.csv")
+df_years <- read_csv("/Users/katiemurenbeeld/Analysis/VIP_NLP/test_tracking_values/data/processed/test_wvo_vectors_years_2025-09-23.csv")
 
 # STEP 2: Prepare data for use in plotting
 # ------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ df_vec_sum_yr <- df_years %>%
   summarise(head_x = sum(x), 
             head_y = sum(y),
             polarity = length(unique(reg_05_pred_class)) * 30,
-            wm_angle = (atan((abs(head_y) / head_x))*(180/pi)) + 270,
+            wm_angle = (atan((abs(head_y) / head_x))*(180/pi)),
             wm_wvo = sum((reg_05_pred_class * mag)/sum(mag)),
             total_articles = sum(mag))
 
@@ -56,7 +56,7 @@ df_vec_sum_m <- df_months %>%
   group_by(`Publication Title`, month_yr) %>% # change to month_yr or year 
   summarise(head_x = sum(x), 
             head_y = sum(y),
-            polarity = length(unique(reg_05_pred_class)) * 30,
+            polarity = (length(unique(reg_05_pred_class))) * 30,
             wm_angle = atan((abs(head_y) / head_x))*(-180/pi),
             wm_wvo = sum((reg_05_pred_class * mag)/sum(mag)),
             total_articles = sum(mag))
