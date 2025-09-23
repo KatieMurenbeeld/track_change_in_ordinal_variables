@@ -54,6 +54,9 @@ tbg_yr <- df_vec_sum_yr %>%
 gfb_yr <- df_vec_sum_yr %>%
   filter(`Publication Title` == "Great Falls Tribune")
 
+nyt_yr <- df_vec_sum_yr %>%
+  filter(`Publication Title` == "New York Times")
+
 ## pseudocode ############### 
 ## Stepping through ten years 1989-1999, 1990-2000, 1991-2001, etc.
 
@@ -70,10 +73,17 @@ gft_10yr_df <- gfb_yr %>%
          yend_10 = lead(wm_wvo, n = 10)) %>%
   filter(xend_10 <= max(year))
 
+nyt_10yr_df <- nyt_yr %>%
+  mutate(x_10 = year, 
+         xend_10 = year+10, 
+         y_10 = wm_wvo, 
+         yend_10 = lead(wm_wvo, n = 10)) %>%
+  filter(xend_10 <= max(year))
+
 ## Plot the line between the start and end year 10 year gap
-p10 <- ggplot(gft_10yr_df, aes(x = x_10, y = y_10, xend = xend_10, yend = yend_10)) +
+p10 <- ggplot(nyt_10yr_df, aes(x = x_10, y = y_10, xend = xend_10, yend = yend_10)) +
   geom_segment(size = 1, arrow = arrow(length = unit(0.15, "cm")), color = blues[30]) + # Optional: adjust size and add arrows
-  gghighlight(x_10 %in% c(2004, 2007))
+  gghighlight(x_10 %in% c(2004, 2007), unhighlighted_params = list(color = NULL, linewidth = 0.5))
 #the above code is adapted from the google AI result for "plot multiple geom_segments r"
 #This approach allows for the efficient plotting of numerous segments, with the ability to differentiate them by aesthetic mappings based on variables within the data frame.
 print(p10)
@@ -147,12 +157,15 @@ gft_5yr_df <- gfb_yr %>%
 
 p5 <- ggplot(gft_5yr_df, aes(x = x_5, y = y_5, xend = xend_5, yend = yend_5)) +
   geom_segment(size = 1, arrow = arrow(length = unit(0.15, "cm")), color = blues[30]) + # Optional: adjust size and add arrows
-  gghighlight(x_5 %in% c(2004:2009))
+  gghighlight(x_5 %in% c(2004:2009), unhighlighted_params = list(color = NULL, linewidth = 0.5))
 p5
 
 final_p5 <- p5 +
   geom_point(x = 2004, y = gft_5yr_df$y_5[gft_5yr_df$x_5 == 2004], color = "#585858FF") +
   geom_point(x = 2014, y = gft_5yr_df$yend_5[gft_5yr_df$xend_5 == 2014], color = "#585858FF") +
+  geom_segment(x = gft_5yr_df$x_5[gft_5yr_df$x_5 == 2004], y = gft_5yr_df$y_5[gft_5yr_df$x_5 == 2004], 
+               xend = gft_5yr_df$xend_5[gft_5yr_df$xend_5 == 2014], yend = gft_5yr_df$yend_5[gft_5yr_df$xend_5 == 2014], 
+               color = "black", linetype = "dashed") +
   geom_hline(yintercept = 4, color = "grey", linetype = "dashed") + 
   annotate("text", x = 2027, y = 4.15, label = "Neutral") + 
   annotate("text", x = 2027, y = 6.1, label = "Mutualism") + 
